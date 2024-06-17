@@ -36,12 +36,14 @@ pattern = 'wbwbwwbwbwbw'
 p_length = len(pattern)
 
 
-def auxFunc(w: int, b: int) -> bool:
-    w_num, b_num = 0, 0
+def lookupInStr(length: int, w: int, b: int) -> bool:
+    if length > p_length:
+        return False
 
-    for i in range(0, p_length-(w+b)+1):
+    w_num, b_num = 0, 0
+    for i in range(0, p_length-length+1):
         if i == 0:
-            for j in range(i, i+w+b):
+            for j in range(i, i+length):
                 if pattern[j] == 'w':
                     w_num += 1
                 else:
@@ -52,19 +54,23 @@ def auxFunc(w: int, b: int) -> bool:
             else:
                 b_num -= 1
 
-            if pattern[i+w+b-1] == 'w':
+            if pattern[i+length-1] == 'w':
                 w_num += 1
             else:
                 b_num += 1
 
-        if w_num == w and b_num == b_num:
+        if w_num == w and b_num == b:
             return True
 
-    repeat_num = (w+b) // p_length
-    w_num = repeat_num*7
-    b_num = repeat_num*5
-    resd_length = (w+b) % p_length
-    for i in range(resd_length+1):
+    return False
+
+
+def lookupAtJunction(length: int, w: int, b: int) -> bool:
+    if length > p_length:
+        return False
+
+    w_num, b_num = 0, 0
+    for i in range(length+1):
         # lookup the forward part
         for j in range(-1, -1-i, -1):
             if pattern[j] == 'w':
@@ -72,16 +78,32 @@ def auxFunc(w: int, b: int) -> bool:
             else:
                 b_num += 1
         # lookup the backward part
-        for j in range(0, resd_length-i):
+        for j in range(0, length-i):
             if pattern[j] == 'w':
                 w_num += 1
             else:
                 b_num += 1
 
-        if w_num == w and b_num == b_num:
+        if w_num == w and b_num == b:
             return True
 
     return False
+
+
+def auxFunc(w: int, b: int) -> bool:
+    if lookupInStr(w+b, w, b) or lookupAtJunction(w+b, w, b):
+        return True
+
+    repeat_num = (w+b) // p_length
+    w_num = repeat_num*7
+    b_num = repeat_num*5
+    resd_length = (w+b) % p_length
+
+    if lookupInStr(resd_length, w-w_num, b-b_num) or lookupAtJunction(resd_length, w-w_num, b-b_num):
+        return True
+
+    return False
+
 
 
 def main():

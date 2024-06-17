@@ -1,4 +1,4 @@
-def handle_input() -> tuple[int, int]:
+def auxInput() -> tuple[int, int]:
     input_string = input()
     parts = input_string.split()
     if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
@@ -16,65 +16,82 @@ def handle_input() -> tuple[int, int]:
         raise Exception('invalid input')
 
 
-def main() -> bool:
-    pattern = 'wbwbwwbwbwbw'
-    p_length = len(pattern)
-    w, b = handle_input()
-    w_num, b_num = 0, 0
-    if w+b <= len(pattern):
-        for i in range(0, p_length-(w+b)+1):
-            if i == 0:
-                for j in range(i, i+w+b):
-                    if pattern[j] == 'w':
-                        w_num += 1
-                    else:
-                        b_num += 1
-            else:
-                if pattern[i-1] == 'w':
-                    w_num -= 1
-                else:
-                    b_num -= 1
+def handle_input() -> list[tuple[int, int]]:
+    n = input()
+    if not n.isdigit():
+        raise Exception('invalid n')
 
-                if pattern[i+w+b-1] == 'w':
+    n = int(n)
+    if n < 0 or n > 10:
+        raise Exception('0<=n<=10')
+
+    ans: list[tuple[int, int]] = []
+    for _ in range(n):
+        ans.append(auxInput())
+
+    return ans
+
+
+pattern = 'wbwbwwbwbwbw'
+p_length = len(pattern)
+
+
+def auxFunc(w: int, b: int) -> bool:
+    w_num, b_num = 0, 0
+
+    for i in range(0, p_length-(w+b)+1):
+        if i == 0:
+            for j in range(i, i+w+b):
+                if pattern[j] == 'w':
                     w_num += 1
                 else:
                     b_num += 1
+        else:
+            if pattern[i-1] == 'w':
+                w_num -= 1
+            else:
+                b_num -= 1
 
-            if w_num == w and b_num == b_num:
-                return True
-
-        return False
-
-    else:
-        for chr in pattern:
-            if chr == 'w':
+            if pattern[i+w+b-1] == 'w':
                 w_num += 1
             else:
                 b_num += 1
 
-        repeat_num = (w+b) // len(pattern)
-        w_num = repeat_num*w_num
-        b_num = repeat_num*b_num
-        resd_length = (w+b) % len(pattern)
-        for i in range(resd_length+1):
-            # lookup the forward part
-            for j in range(-1, -1-i, -1):
-                if pattern[j] == 'w':
-                    w_num += 1
-                else:
-                    b_num += 1
-            # lookup the backward part
-            for j in range(0, resd_length-i):
-                if pattern[j] == 'w':
-                    w_num += 1
-                else:
-                    b_num += 1
+        if w_num == w and b_num == b_num:
+            return True
 
-            if w_num == w and b_num == b_num:
-                return True
+    repeat_num = (w+b) // p_length
+    w_num = repeat_num*7
+    b_num = repeat_num*5
+    resd_length = (w+b) % p_length
+    for i in range(resd_length+1):
+        # lookup the forward part
+        for j in range(-1, -1-i, -1):
+            if pattern[j] == 'w':
+                w_num += 1
+            else:
+                b_num += 1
+        # lookup the backward part
+        for j in range(0, resd_length-i):
+            if pattern[j] == 'w':
+                w_num += 1
+            else:
+                b_num += 1
+
+        if w_num == w and b_num == b_num:
+            return True
 
     return False
 
 
+def main():
+    arr = handle_input()
+    ans: list[bool] = [auxFunc(w, b) for w, b in arr]
+    for value in ans:
+        print("Yes" if value else "No", end=' ')
+
+    print()
+
+
 if __name__ == '__main__':
-    print('Yes' if main() else 'No')
+    main()

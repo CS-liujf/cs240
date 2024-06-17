@@ -69,8 +69,8 @@ def lookupAtJunction(length: int, w: int, b: int) -> bool:
     if length > p_length:
         return False
 
-    w_num, b_num = 0, 0
     for i in range(length+1):
+        w_num, b_num = 0, 0
         # lookup the forward part
         for j in range(-1, -1-i, -1):
             if pattern[j] == 'w':
@@ -99,11 +99,15 @@ def auxFunc(w: int, b: int) -> bool:
     b_num = repeat_num*5
     resd_length = (w+b) % p_length
 
+    if resd_length == 0 and w_num == w and b_num == b:
+        return True
+    elif resd_length == 0:
+        return False
+
     if lookupInStr(resd_length, w-w_num, b-b_num) or lookupAtJunction(resd_length, w-w_num, b-b_num):
         return True
 
     return False
-
 
 
 def main():

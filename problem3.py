@@ -43,7 +43,7 @@ class Solution:
 
         ans = sum([sub[-1] for sub in dp])
         # check
-        if len(self.string) > 2:
+        if len(self.string) > 1:
             for i in range(1, len(self.string)):
                 g_i = int(self.string[-i])
                 if dp[g_i][-i] == 0:
@@ -51,7 +51,7 @@ class Solution:
 
                 g_prev = int(self.string[-(i+1)])
                 temp = g_prev+g_i
-                if temp % 2 != 0 and (temp+1)//2 != g_i and temp//2 != g_i:
+                if temp % 2 != 0 and temp//2+1 != g_i and temp//2 != g_i:
                     break
                 elif temp % 2 == 0 and temp//2 != g_i:
                     break

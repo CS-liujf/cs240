@@ -1,6 +1,3 @@
-from array import array
-
-
 def handle_input() -> tuple[str, str]:
     input_string = input()
     parts = input_string.split()

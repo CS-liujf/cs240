@@ -1,5 +1,8 @@
+from typing import TypedDict
+
+
 def handle_input() -> list[tuple[int, int]]:
-    n = input()
+    n = input().rstrip()
     if not n.isdigit():
         raise Exception('invalid n')
     n = int(n)
@@ -28,10 +31,16 @@ def handle_input() -> list[tuple[int, int]]:
     return res
 
 
+class Invitation(TypedDict):
+    flag: bool
+    sDate: int
+    persons: set[int]
+
+
 def main() -> list[int]:
     res = handle_input()
     n = len(res)
-    res.sort(key=lambda x: x[1])
+    res.sort(key=lambda x: x[1])  # must sort. We take greedy algorithm
     maxDay = res[-1][-1]
     minDay = 2*(10**4)
     for i in range(len(res)):
@@ -46,33 +55,70 @@ def main() -> list[int]:
             if d not in table:
                 table[d] = []
             table[d].append(idx)
-    ans: list[int] = []
-    # n lines
-    for k in range(1, n+1):
-        num = 0
-        # j denotes starting day
-        for j in range(minDay, maxDay-k+2):
-            invited: set[int] = set()
-            # k consecutive days starting from day j. Each day is denoted by day i
-            for i in range(j, j+k):
-                flag = False
-                if i not in table:
-                    break
-                avaliable = table[i]
-                for d in avaliable:
-                    if d not in invited:
-                        invited.add(d)
-                        flag = True
-                        break
+    ans: list[int] = [0 for _ in range(n)]
 
-                # this means that we can not hold a conference from j to j+k because of day i
-                if not flag:
+    ans[0] = len(table)
+    if (ans[0] == 0):
+        return ans
+
+    # in tuple[int, set[int]],
+    # the first ele denotes whether this arragement is valid
+    # the second element denote the starting day
+    invitationList: list[Invitation] = []
+    # find all 2days combination
+    k = 2
+    # j denotes starting day
+    for j in range(minDay, maxDay-k+2):
+        invited: set[int] = set()
+        for i in range(j, j+k):
+            flag = False
+            if i not in table:
+                break
+            avaliable = table[i]
+            for person in avaliable:
+                if person not in invited:
+                    invited.add(person)
+                    flag = True
+                    break
+
+            if not flag:
+                break
+
+        else:
+            invitationList.append(
+                {'flag': True, 'sDate': j, 'persons': invited})
+
+    ans[1] = len(invitationList)
+    if (ans[1] == 0):
+        return ans
+
+    invalidNum = 0
+    total = len(invitationList)
+    for k in range(3, n+1):
+        if invalidNum == total:
+            break
+
+        for i in range(len(invitationList)):
+            if invitationList[i]['flag'] == False:
+                continue
+
+            d = invitationList[i]['sDate']+len(invitationList[i]['persons'])
+            if d not in table:
+                invitationList[i]['flag'] = False
+                invalidNum += 1
+                continue
+
+            avaliable = table[d]
+            for person in avaliable:
+                if person not in invitationList[i]['persons']:
+                    invitationList[i]['persons'].add(person)
                     break
             else:
-                # this meas that we can hold a conference from j to j+k
-                num += 1
+                invitationList[i]['flag'] = False
+                invalidNum += 1
 
-        ans.append(num)
+        else:
+            ans[k-1] = total-invalidNum
 
     return ans
 
